@@ -7,18 +7,22 @@
 
 import SwiftUI
 
+/// Root container for the app.
+/// Kept for compatibility with the project template; the actual
+/// app UI lives in `The_LabApp` via `VariedTabbarView()`.
 struct ContentView: View {
-    var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
-        }
-        .padding()
-    }
+	@StateObject private var downloadManager = DownloadManager.shared
+	let storage = Storage.shared
+	
+	var body: some View {
+		VStack(spacing: 0) {
+			DownloadHeaderView(downloadManager: downloadManager)
+			VariedTabbarView()
+				.environment(\.managedObjectContext, storage.context)
+		}
+	}
 }
 
 #Preview {
-    ContentView()
+	ContentView()
 }

@@ -1,7 +1,6 @@
 //
 //  SettingsView.swift
-//  Feather
-//
+//  The Lab
 //  Created by samara on 10.04.2025.
 //
 
@@ -33,31 +32,23 @@ struct SettingsView: View {
 		return _certificates[_storedSelectedCert]
 	}
 
-    
-	private let _donationsUrl = "https://github.com/sponsors/claration"
-	private let _githubUrl = "https://github.com/claration/Feather"
-    
 	// MARK: Body
 	var body: some View {
 		NBNavigationView(.localized("Settings")) {
 			Form {
-				#if !NIGHTLY && !DEBUG
-					SettingsDonationCellView(site: _donationsUrl)
-				#endif
-                
-				_feedback()
-                
+				_about()
+
 				Section {
 					NavigationLink(destination: AppearanceView()) {
-						Label(.localized("Appearance"), systemImage: "paintbrush")
+						Label(.localized("Appearance"), systemImage: "eyedropper")
 					}
 					NavigationLink(destination: AppIconView(currentIcon: $_currentIcon)) {
-						Label(.localized("App Icon"), systemImage: "app.badge")
+						Label(.localized("App Icon"), systemImage: "app.dashed")
 					}
 				}
-                
+
 				NBSection(.localized("Certificates")) {
-                    
+
 					if let cert = selectedCertificate {
 						CertificatesCellView(cert: cert)
 					} else {
@@ -66,37 +57,39 @@ struct SettingsView: View {
 							.foregroundColor(.disabled())
 					}
 					NavigationLink(destination: CertificatesView()) {
-						Label(.localized("Certificates"), systemImage: "checkmark.seal")
+						Label(.localized("Certificates"), systemImage: "checkmark.shield")
 					}
-                 
+
 				} footer: {
 					Text(.localized("Add and manage certificates used for signing applications."))
 				}
-                
+
 				NBSection(.localized("Features")) {
 					NavigationLink(destination: ConfigurationView()) {
-						Label(.localized("Signing Options"), systemImage: "signature")
+						Label(.localized("Signing Options"), systemImage: "wand.and.stars")
 					}
 					NavigationLink(destination: ArchiveView()) {
-						Label(.localized("Archive & Compression"), systemImage: "archivebox")
+						Label(.localized("Archive & Compression"), systemImage: "cylinder.split.1x2")
 					}
 					NavigationLink(destination: InstallationView()) {
-						Label(.localized("Installation"), systemImage: "arrow.down.circle")
+						Label(.localized("Installation"), systemImage: "cable.connector")
 					}
 				} footer: {
 					Text(.localized("Configure the apps way of installing, its zip compression levels, and custom modifications to apps."))
 				}
-                
+
 				_directories()
-                
+
 				Section {
 					NavigationLink(destination: ResetView()) {
-						Label(.localized("Reset"), systemImage: "trash")
+						Label(.localized("Reset"), systemImage: "flask")
 					}
 				} footer: {
 					Text(.localized("Reset the applications sources, certificates, apps, and general contents."))
 				}
 			}
+			.scrollContentBackground(.hidden)
+			.background(LabTheme.surfacePrimary.ignoresSafeArea())
 		}
 	}
 }
@@ -104,7 +97,7 @@ struct SettingsView: View {
 // MARK: - View extension
 extension SettingsView {
 	@ViewBuilder
-	private func _feedback() -> some View {
+	private func _about() -> some View {
 		Section {
 			NavigationLink(destination: AboutView()) {
 				Label {
@@ -113,30 +106,9 @@ extension SettingsView {
 					FRAppIconView(size: 23)
 				}
 			}
-            
-			Button(.localized("Submit Feedback"), systemImage: "safari") {
-				let bugAction: UIAlertAction = .init(title: .localized("Bug Report"), style: .default) { _ in
-					UIApplication.open(_makeGitHubIssueURL(url: _githubUrl))
-				}
-				
-				let chooseAction: UIAlertAction = .init(title: .localized("Other"), style: .default) { _ in
-					UIApplication.open(URL(string: "\(_githubUrl)/issues/new/choose")!)
-				}
-				
-				UIAlertController.showAlertWithCancel(
-					title: .localized("Submit Feedback"),
-					message: nil,
-					actions: [bugAction, chooseAction]
-				)
-			}
-			Button(.localized("GitHub Repository"), systemImage: "safari") {
-				UIApplication.open(_githubUrl)
-			}
-		} footer: {
-			Text(.localized("If any issues occur within the app please report it via the GitHub repository. When submitting an issue, make sure to submit detailed information."))
 		}
 	}
-    
+
 	@ViewBuilder
 	private func _directories() -> some View {
 		NBSection(.localized("Misc")) {
@@ -152,53 +124,5 @@ extension SettingsView {
 		} footer: {
 			Text(.localized("All of the apps files are contained in the documents directory, here are some quick links to these."))
 		}
-	}
-    
-	private func _makeGitHubIssueURL(url: String) -> String {
-		var configurationSection = "### App Configuration:\n"
-		
-		switch UserDefaults.standard.integer(forKey: "Feather.installationMethod") {
-		case 0: // Server
-			let serverMethod = UserDefaults.standard.integer(forKey: "Feather.serverMethod")
-			let ipFix = UserDefaults.standard.bool(forKey: "Feather.ipFix")
-			let serverType = (serverMethod == 0) ? "Fully Local" : "Semi Local"
-			configurationSection += "- Install method: `Server`\n"
-			configurationSection += "  - Server type: `\(serverType)`\n"
-			configurationSection += "  - IP Fix: `\(ipFix)`\n"
-		case 1: // idevice
-			let pairingPath = HeartbeatManager.pairingFile()
-			let pairingExists = FileManager.default.fileExists(atPath: pairingPath)
-			let pairingStatus = pairingExists ? "`Present`" : "`Not Present`"
-			configurationSection += "- Install method: `idevice`\n"
-			configurationSection += "  - Pairing file: \(pairingStatus)\n"
-		default:
-			configurationSection += "- Install method: `Unknown`\n"
-		}
-        
-		let body = """
-		### Device Information
-		- Device: `\(MobileGestalt().getStringForName("PhysicalHardwareNameString") ?? "Unknown")`
-		- iOS Version: `\(UIDevice.current.systemVersion)`
-		- App Version: `\(Bundle.main.version)`
-		
-		\(configurationSection)
-		
-		### Issue Description
-		<!-- Describe your issue here -->
-		
-		### Steps to Reproduce
-		1. 
-		2. 
-		3. 
-		
-		### Expected Behavior
-		
-		### Actual Behavior
-		"""
-		let encodedTitle = "[Bug] replace this with a descriptive title "
-			.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-		let encodedBody = body
-			.addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-		return "\(url)/issues/new?template=bug.yml&title=\(encodedTitle)&text=\(encodedBody)"
 	}
 }

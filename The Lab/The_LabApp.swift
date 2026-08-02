@@ -30,7 +30,8 @@ struct The_LabApp: App {
 					.transition(.move(edge: .top).combined(with: .opacity))
 			}
 			.preferredColorScheme(.dark)
-			.background(Color.black.ignoresSafeArea())
+			.tint(LabTheme.accent)
+			.background(LabTheme.oledBlack.ignoresSafeArea())
 			.animation(.smooth, value: downloadManager.manualDownloads.description)
 			.onReceive(NotificationCenter.default.publisher(for: .heartbeatInvalidHost)) { _ in
 				DispatchQueue.main.async {
@@ -45,7 +46,7 @@ struct The_LabApp: App {
 					UIApplication.topViewController()?.view.window?.overrideUserInterfaceStyle = style
 				}
 				
-				UIApplication.topViewController()?.view.window?.tintColor = UIColor(Color(hex: UserDefaults.standard.string(forKey: "Feather.userTintColor") ?? "#848ef9"))
+				UIApplication.topViewController()?.view.window?.tintColor = UIColor(Color(hex: UserDefaults.standard.string(forKey: "Feather.userTintColor") ?? "#FF0097"))
 			}
 		}
 	}
@@ -149,6 +150,7 @@ class AppDelegate: NSObject, UIApplicationDelegate {
 		_ application: UIApplication,
 		didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]? = nil
 	) -> Bool {
+		LabAppearance.configure()
 		_createPipeline()
 		_createDocumentsDirectories()
 		ResetView.clearWorkCache()

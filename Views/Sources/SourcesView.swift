@@ -1,8 +1,8 @@
 //
-//  SourcesView.swift
-//  Feather
+//	SourcesView.swift
+//	The Lab
 //
-//  Created by samara on 10.04.2025.
+//	Created by samara on 10.04.2025.
 //
 
 import CoreData
@@ -13,85 +13,50 @@ import NimbleViews
 // MARK: - View
 struct SourcesView: View {
 	@Environment(\.horizontalSizeClass) private var horizontalSizeClass
-	#if !NIGHTLY && !DEBUG
-		@AppStorage("Feather.shouldStar") private var _shouldStar: Int = 0
-	#endif
 	@StateObject var viewModel = SourcesViewModel.shared
 	@State private var _isAddingPresenting = false
 	@State private var _addingSourceLoading = false
 	@State private var _searchText = ""
-	
+
 	private var _filteredSources: [AltSource] {
 		_sources.filter { _searchText.isEmpty || ($0.name?.localizedCaseInsensitiveContains(_searchText) ?? false) }
 	}
-	
+
 	@FetchRequest(
 		entity: AltSource.entity(),
 		sortDescriptors: [NSSortDescriptor(keyPath: \AltSource.name, ascending: true)],
 		animation: .snappy
 	) private var _sources: FetchedResults<AltSource>
-	
+
 	// MARK: Body
 	var body: some View {
-		NBNavigationView(.localized("Sources")) {
-			NBListAdaptable {
-				if !_filteredSources.isEmpty {
-					Section {
-						NavigationLink {
-							SourceAppsView(object: Array(_sources), viewModel: viewModel)
-						} label: {
-							let isRegular = horizontalSizeClass != .compact
-							HStack(spacing: 18) {
-								Image("Repositories").appIconStyle()
-								NBTitleWithSubtitleView(
-									title: .localized("All Repositories"),
-									subtitle: .localized("See all apps from your sources")
-								)
-							}
-							.padding(isRegular ? 12 : 0)
-							.background(
-								isRegular
-									? RoundedRectangle(cornerRadius: 18, style: .continuous)
-									.fill(Color(.quaternarySystemFill))
-									: nil
-							)
-						}
-						.buttonStyle(.plain)
-					}
-					
-					NBSection(
-						.localized("Repositories"),
-						secondary: _filteredSources.count.description
-					) {
-						ForEach(_filteredSources) { source in
-							NavigationLink {
-								SourceAppsView(object: [source], viewModel: viewModel)
-							} label: {
-								SourcesCellView(source: source)
-							}
-							.buttonStyle(.plain)
-						}
+		NBNavigationView("", displayMode: .inline) {
+			ScrollView {
+				VStack(alignment: .leading, spacing: 18) {
+					LabBrandView()
+						.padding(.top, 8)
+
+					LabSearchField(text: $_searchText)
+
+					if _filteredSources.isEmpty {
+						_emptyState
+					} else {
+						_allRepositoriesCard
+
+						LabSectionHeader(
+							title: .localized("Repositories"),
+							count: _filteredSources.count
+						)
+						.padding(.top, 2)
+
+						_repositoriesCard
 					}
 				}
+				.padding(.horizontal, LabTheme.pagePadding)
+				.padding(.bottom, 40)
 			}
-			.searchable(text: $_searchText, placement: .platform())
-			.overlay {
-				if _filteredSources.isEmpty {
-					if #available(iOS 17, *) {
-						ContentUnavailableView {
-							Label(.localized("No Repositories"), systemImage: "globe.desk.fill")
-						} description: {
-							Text(.localized("Get started by adding your first repository."))
-						} actions: {
-							Button {
-								_isAddingPresenting = true
-							} label: {
-								NBButton(.localized("Add Source"), style: .text)
-							}
-						}
-					}
-				}
-			}
+			.background(LabTheme.oledBlack.ignoresSafeArea())
+			.scrollDismissesKeyboard(.immediately)
 			.toolbar {
 				NBToolbarButton(
 					systemImage: "plus",
@@ -112,23 +77,90 @@ struct SourcesView: View {
 		.task(id: Array(_sources)) {
 			await viewModel.fetchSources(_sources)
 		}
-		#if !NIGHTLY && !DEBUG
-		.onAppear {
-				guard _shouldStar < 6 else { return }; _shouldStar += 1
-				guard _shouldStar == 6 else { return }
-			
-				let github = UIAlertAction(title: "GitHub", style: .default) { _ in
-					UIApplication.open("https://github.com/khcrysalis/Feather")
+	}
+}
+
+// MARK: - Components
+extension SourcesView {
+	private var _allRepositoriesCard: some View {
+		NavigationLink {
+			SourceAppsView(object: Array(_sources), viewModel: viewModel)
+		} label: {
+			HStack(spacing: 16) {
+				Image("Repositories").appIconStyle()
+
+				VStack(alignment: .leading, spacing: 3) {
+					Text(.localized("All Repositories"))
+						.font(.system(size: 17, weight: .semibold))
+						.foregroundStyle(LabTheme.textPrimary)
+					Text(.localized("See all apps from your sources"))
+						.font(.system(size: 14))
+						.foregroundStyle(LabTheme.textTertiary)
 				}
-			
-				let cancel = UIAlertAction(title: .localized("Dismiss"), style: .cancel)
-			
-				UIAlertController.showAlert(
-					title: .localized("Enjoying %@?", arguments: Bundle.main.name),
-					message: .localized("Go to our GitHub and give us a star!"),
-					actions: [github, cancel]
-				)
+
+				Spacer()
+
+				Image(systemName: "chevron.right")
+					.font(.system(size: 13, weight: .semibold))
+					.foregroundStyle(LabTheme.textTertiary)
 			}
-		#endif
+			.padding(LabTheme.cardPadding)
+			.labCard()
+			.contentShape(
+				RoundedRectangle(cornerRadius: LabTheme.cardCornerRadius, style: .continuous)
+			)
+		}
+		.buttonStyle(.plain)
+	}
+
+	private var _repositoriesCard: some View {
+		LabCard {
+			VStack(spacing: 0) {
+				ForEach(Array(_filteredSources.enumerated()), id: \.element.identifier) { index, source in
+					NavigationLink {
+						SourceAppsView(object: [source], viewModel: viewModel)
+					} label: {
+						SourcesCellView(source: source)
+					}
+					.buttonStyle(.plain)
+					.padding(.horizontal, 12)
+					.padding(.vertical, 12)
+
+					if index < _filteredSources.count - 1 {
+						LabDivider()
+							.padding(.leading, 58)
+					}
+				}
+			}
+		}
+	}
+
+	private var _emptyState: some View {
+		LabCard {
+			VStack(spacing: 14) {
+				LabBeakerIcon(size: 88)
+					.padding(.top, 12)
+
+				Text(.localized("No Repositories"))
+					.font(.playfair(22, weight: .semiBold))
+					.foregroundStyle(LabTheme.textPrimary)
+
+				Text(.localized("Get started by adding your first repository."))
+					.font(.system(size: 14))
+					.foregroundStyle(LabTheme.textTertiary)
+					.multilineTextAlignment(.center)
+
+				Button {
+					_isAddingPresenting = true
+				} label: {
+					Text(.localized("Add Source"))
+				}
+				.buttonStyle(LabPrimaryButtonStyle())
+				.padding(.top, 6)
+				.padding(.bottom, 12)
+			}
+			.frame(maxWidth: .infinity)
+			.padding(20)
+		}
 	}
 }

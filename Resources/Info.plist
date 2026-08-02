@@ -140,6 +140,23 @@
 	</dict>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>The Lab needs access to your local network to serve installation manifests and connect to paired devices during app installation.</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>PlayfairDisplay-Black.ttf</string>
+		<string>PlayfairDisplay-BlackItalic.ttf</string>
+		<string>PlayfairDisplay-Bold.ttf</string>
+		<string>PlayfairDisplay-BoldItalic.ttf</string>
+		<string>PlayfairDisplay-ExtraBold.ttf</string>
+		<string>PlayfairDisplay-ExtraBoldItalic.ttf</string>
+		<string>PlayfairDisplay-Italic-VariableFont_wght.ttf</string>
+		<string>PlayfairDisplay-Italic.ttf</string>
+		<string>PlayfairDisplay-Medium.ttf</string>
+		<string>PlayfairDisplay-MediumItalic.ttf</string>
+		<string>PlayfairDisplay-Regular.ttf</string>
+		<string>PlayfairDisplay-SemiBold.ttf</string>
+		<string>PlayfairDisplay-SemiBoldItalic.ttf</string>
+		<string>PlayfairDisplay-VariableFont_wght.ttf</string>
+	</array>
 	<key>UIBackgroundModes</key>
 	<array>
 		<string>audio</string>

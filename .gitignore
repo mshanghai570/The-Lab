@@ -1,3 +1,7 @@
 *.ipa
+*.log
 .DS_Store
 xcuserdata/
+full_codebase.txt
+Screenshot*.png
+Screenshot*.jpg

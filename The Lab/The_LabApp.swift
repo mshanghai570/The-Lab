@@ -18,7 +18,9 @@ struct The_LabApp: App {
 	
 	@StateObject var downloadManager = DownloadManager.shared
 	let storage = Storage.shared
-	
+
+	@AppStorage("Feather.userTintColor") private var _accentHex: String = "#FF0097"
+
 	var body: some Scene {
 		WindowGroup {
 			VStack {
@@ -30,7 +32,14 @@ struct The_LabApp: App {
 					.transition(.move(edge: .top).combined(with: .opacity))
 			}
 			.preferredColorScheme(.dark)
+			// Reading the accent hex here makes the root re-render when the
+			// theme picker writes it, and the tint environment change then
+			// propagates through the whole hierarchy so every view using
+			// LabTheme.accent repaints immediately.
 			.tint(LabTheme.accent)
+			.onChange(of: _accentHex) { newHex in
+				UIApplication.topViewController()?.view.window?.tintColor = UIColor(Color(hex: newHex))
+			}
 			.background(LabTheme.oledBlack.ignoresSafeArea())
 			.animation(.smooth, value: downloadManager.manualDownloads.description)
 			.onReceive(NotificationCenter.default.publisher(for: .heartbeatInvalidHost)) { _ in

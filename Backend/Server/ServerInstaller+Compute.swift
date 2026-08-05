@@ -13,7 +13,7 @@ import UIKit.UIGraphicsImageRenderer
 extension ServerInstaller {
 	var plistEndpoint: URL {
 		var comps = URLComponents()
-		comps.scheme = self.getServerMethod() == 1 ? "http" : "https"
+		comps.scheme = self.usesTLS ? "https" : "http"
 		comps.host = sni()
 		comps.path = "/\(id).plist"
 		comps.port = port
@@ -22,7 +22,7 @@ extension ServerInstaller {
 
 	var payloadEndpoint: URL {
 		var comps = URLComponents()
-		comps.scheme = self.getServerMethod() == 1 ? "http" : "https"
+		comps.scheme = self.usesTLS ? "https" : "http"
 		comps.host = sni()
 		comps.path = "/\(id).ipa"
 		comps.port = port
@@ -31,7 +31,7 @@ extension ServerInstaller {
 	
 	var pageEndpoint: URL {
 		var comps = URLComponents()
-		comps.scheme = self.getServerMethod() == 1 ? "http" : "https"
+		comps.scheme = self.usesTLS ? "https" : "http"
 		comps.host = sni()
 		comps.path = "/install"
 		comps.port = port
@@ -60,7 +60,7 @@ extension ServerInstaller {
 
 	var displayImageSmallEndpoint: URL {
 		var comps = URLComponents()
-		comps.scheme = "https"
+		comps.scheme = self.usesTLS ? "https" : "http"
 		comps.host = sni()
 		comps.path = "/app57x57.png"
 		comps.port = port
@@ -69,7 +69,7 @@ extension ServerInstaller {
 
 	var displayImageLargeEndpoint: URL {
 		var comps = URLComponents()
-		comps.scheme = "https"
+		comps.scheme = self.usesTLS ? "https" : "http"
 		comps.host = sni()
 		comps.path = "/app512x512.png"
 		comps.port = port
@@ -94,7 +94,11 @@ extension ServerInstaller {
 	}
 
 	var html: String {
-		"""
+		// Every server type hands SpringBoard the palera.in HTTPS manifest
+		// (the payload still streams from the local loopback listener). A plain
+		// HTTP manifest URL is rejected by iOS 18 installd with “cannot connect
+		// to 127.0.0.1” — the HTTPS manifest is what makes installs succeed.
+		return """
 		<html style="background-color: black;">
 		<script type="text/javascript">window.location="\(iTunesLinkExternal)"</script>
 		</html>

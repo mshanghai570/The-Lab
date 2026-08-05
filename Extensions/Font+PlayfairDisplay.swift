@@ -1,30 +1,29 @@
 //
-//  Font+PlayfairDisplay.swift
-//  The Lab
+//	Font+PlayfairDisplay.swift
+//	The Lab
 //
-//  Created by Michael Shingara on 8/2/26.
+//	Created by Michael Shingara on 8/2/26.
 //
 
 import SwiftUI
 
 /// The Lab's branding typeface.
-/// The Playfair Display family ships inside `Resources/Fonts/` and is
-/// registered via `UIAppFonts` in Info.plist.
+///
+/// The Playfair Display family ships four static weights inside
+/// `Resources/Fonts/` and is registered via `UIAppFonts` in Info.plist.
+/// Use the semantic weights — they map to the four bundled faces so the
+/// package stays lean:
+///
+///	  - Bold	 → hero headers ("THE LAB", page titles)
+///	  - SemiBold → card titles, specimen names
+///	  - Regular	 → secondary / body text
+///	  - Italic	 → special accents, specimen annotations
 enum Playfair {
 	enum Weight: String, CaseIterable {
-		case black = "PlayfairDisplay-Black"
-		case blackItalic = "PlayfairDisplay-BlackItalic"
 		case bold = "PlayfairDisplay-Bold"
-		case boldItalic = "PlayfairDisplay-BoldItalic"
-		case extraBold = "PlayfairDisplay-ExtraBold"
-		case extraBoldItalic = "PlayfairDisplay-ExtraBoldItalic"
-		case italic = "PlayfairDisplay-Italic"
-		case medium = "PlayfairDisplay-Medium"
-		case mediumItalic = "PlayfairDisplay-MediumItalic"
-		case regular = "PlayfairDisplay-Regular"
 		case semiBold = "PlayfairDisplay-SemiBold"
-		case semiBoldItalic = "PlayfairDisplay-SemiBoldItalic"
-		case variable = "PlayfairDisplay-VariableFont_wght"
+		case regular = "PlayfairDisplay-Regular"
+		case italic = "PlayfairDisplay-Italic"
 	}
 }
 

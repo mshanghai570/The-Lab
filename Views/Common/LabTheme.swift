@@ -26,8 +26,13 @@ enum LabTheme {
 	static let surfaceElevated = Color(red: 24.0 / 255.0, green: 24.0 / 255.0, blue: 28.0 / 255.0)
 
 	// MARK: - Signal palette
-	/// Hot pink — The Lab's primary accent.
-	static let accent = Color(red: 1.0, green: 0.0, blue: 151.0 / 255.0)
+	/// The Lab's primary accent — follows the user's chosen theme color
+	/// (`Feather.userTintColor`, set by the Appearance theme picker).
+	/// Falls back to the classic hot pink when nothing is stored.
+	static var accent: Color {
+		let hex = UserDefaults.standard.string(forKey: "Feather.userTintColor") ?? "#FF0097"
+		return Color(hex: hex)
+	}
 	/// Neon green — success, live signals, outlines.
 	static let neon = Color(red: 0.0, green: 1.0, blue: 0.0)
 

@@ -2,6 +2,8 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>AppBuildTag</key>
+	<string>build 13 • 2026-08-05 04:40</string>
 	<key>BGTaskSchedulerPermittedIdentifiers</key>
 	<array>
 		<string>$(PRODUCT_BUNDLE_IDENTIFIER).userTask.*</string>
@@ -41,56 +43,38 @@
 	<dict>
 		<key>CFBundleAlternateIcons</key>
 		<dict>
-			<key>Donor</key>
+			<key>1785716933087_0</key>
 			<dict>
 				<key>CFBundleIconFiles</key>
 				<array>
-					<string>Donor</string>
+					<string>1785716933087_0</string>
 				</array>
 				<key>UIPrerenderedIcon</key>
 				<false/>
 			</dict>
-			<key>V0</key>
+			<key>IMG_2775</key>
 			<dict>
 				<key>CFBundleIconFiles</key>
 				<array>
-					<string>V0</string>
+					<string>IMG_2775</string>
 				</array>
 				<key>UIPrerenderedIcon</key>
 				<false/>
 			</dict>
-			<key>V1</key>
+			<key>IMG_2780</key>
 			<dict>
 				<key>CFBundleIconFiles</key>
 				<array>
-					<string>V1</string>
+					<string>IMG_2780</string>
 				</array>
 				<key>UIPrerenderedIcon</key>
 				<false/>
 			</dict>
-			<key>V1Mac</key>
+			<key>thelabicon4</key>
 			<dict>
 				<key>CFBundleIconFiles</key>
 				<array>
-					<string>V1Mac</string>
-				</array>
-				<key>UIPrerenderedIcon</key>
-				<false/>
-			</dict>
-			<key>V2Mac</key>
-			<dict>
-				<key>CFBundleIconFiles</key>
-				<array>
-					<string>V2Mac</string>
-				</array>
-				<key>UIPrerenderedIcon</key>
-				<false/>
-			</dict>
-			<key>Wing</key>
-			<dict>
-				<key>CFBundleIconFiles</key>
-				<array>
-					<string>Wing</string>
+					<string>thelabicon4</string>
 				</array>
 				<key>UIPrerenderedIcon</key>
 				<false/>
@@ -124,9 +108,20 @@
 	<key>LSApplicationQueriesSchemes</key>
 	<array>
 		<string>localdevvpn</string>
+		<string>itms-services</string>
+		<string>itms-apps</string>
 	</array>
 	<key>NSAppTransportSecurity</key>
 	<dict>
+		<!-- The install server and its manifest are served over plain HTTP on
+		     the loopback (Fully Local) / LAN (Semi Local) interface. Allow those
+		     cleartext connections for the in-app install page and any URLSession
+		     fetches; this is a sideloaded app, so there is no App Store
+		     restriction on NSAllowsArbitraryLoads. -->
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+		<key>NSAllowsLocalNetworking</key>
+		<true/>
 		<key>NSExceptionDomains</key>
 		<dict>
 			<key>claration.dev</key>
@@ -142,20 +137,10 @@
 	<string>The Lab needs access to your local network to serve installation manifests and connect to paired devices during app installation.</string>
 	<key>UIAppFonts</key>
 	<array>
-		<string>PlayfairDisplay-Black.ttf</string>
-		<string>PlayfairDisplay-BlackItalic.ttf</string>
 		<string>PlayfairDisplay-Bold.ttf</string>
-		<string>PlayfairDisplay-BoldItalic.ttf</string>
-		<string>PlayfairDisplay-ExtraBold.ttf</string>
-		<string>PlayfairDisplay-ExtraBoldItalic.ttf</string>
-		<string>PlayfairDisplay-Italic-VariableFont_wght.ttf</string>
 		<string>PlayfairDisplay-Italic.ttf</string>
-		<string>PlayfairDisplay-Medium.ttf</string>
-		<string>PlayfairDisplay-MediumItalic.ttf</string>
 		<string>PlayfairDisplay-Regular.ttf</string>
 		<string>PlayfairDisplay-SemiBold.ttf</string>
-		<string>PlayfairDisplay-SemiBoldItalic.ttf</string>
-		<string>PlayfairDisplay-VariableFont_wght.ttf</string>
 	</array>
 	<key>UIBackgroundModes</key>
 	<array>

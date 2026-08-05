@@ -7,11 +7,10 @@
 
 import SwiftUI
 
-/// The Lab's brand lockup — a beacon inside an outlined hot-pink square,
-/// with the app name set in Playfair Display.
+/// The Lab's brand lockup — the beaker mark inside an outlined hot-pink
+/// square, with the app name set in Playfair Display.
 struct LabBrandView: View {
 	private let pink = Color(red: 1.0, green: 0.0, blue: 151.0 / 255.0)
-	private let neonGreen = Color(red: 0.0, green: 1.0, blue: 0.0)
 
 	var body: some View {
 		HStack(spacing: 18) {
@@ -21,14 +20,11 @@ struct LabBrandView: View {
 					.frame(width: 64, height: 64)
 					.labGlow(pink, radius: 14, opacity: 0.28)
 
-				Image(systemName: "beacon")
-					.font(.system(size: 30, weight: .medium))
-					.foregroundStyle(neonGreen)
-					.labGlow(neonGreen, radius: 9, opacity: 0.45)
+				LabBeakerIcon(size: 44)
 			}
 
 			Text("The Lab")
-				.font(.playfair(40, weight: .black))
+				.font(.playfair(40, weight: .bold))
 				.kerning(0.5)
 		}
 		.frame(maxWidth: .infinity, alignment: .leading)

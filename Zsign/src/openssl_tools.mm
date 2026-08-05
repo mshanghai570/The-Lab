@@ -41,16 +41,15 @@ bool p12_password_check(NSString *file, NSString *pass) {
 		return false;
 	}
 	
-	if( PKCS12_verify_mac(p12, NULL, 0) ) {
-		return true;
-	} else if( PKCS12_verify_mac(p12, strPass.c_str(), -1) ) {
-		return true;
-	} else {
-		return false;
+	bool valid = false;
+	if (PKCS12_verify_mac(p12, NULL, 0)) {
+		valid = true;
+	} else if (PKCS12_verify_mac(p12, strPass.c_str(), -1)) {
+		valid = true;
 	}
 	
 	PKCS12_free(p12);
-	return false;
+	return valid;
 }
 
 // This is fucking bullshit IMO.
@@ -67,8 +66,16 @@ void password_check_fix_WHAT_THE_FUCK(NSString *path) {
 	ZFile::ReadFile(strProvisionFile.c_str(), strProvisionData);
 	
 	BIO *in = BIO_new(BIO_s_mem());
-	OPENSSL_assert((size_t)BIO_write(in, strProvisionData.data(), (int)strProvisionData.size()) == strProvisionData.size());
-	d2i_CMS_bio(in, NULL);
+	if (!in) return;
+	
+	if ((size_t)BIO_write(in, strProvisionData.data(), (int)strProvisionData.size()) != strProvisionData.size()) {
+		BIO_free(in);
+		return;
+	}
+	
+	CMS_ContentInfo *cms = d2i_CMS_bio(in, NULL);
+	if (cms) CMS_ContentInfo_free(cms);
+	BIO_free(in);
 }
 
 void password_check_fix_WHAT_THE_FUCK_free(NSString *path) {

@@ -24,16 +24,30 @@ extension ServerInstaller {
 	
 	func setupApp(port: Int) throws -> Application {
 		let app = Application(Self.env)
-		app.threadPool = .init(numberOfThreads: 1)
+		// The installer streams a multi-megabyte payload to SpringBoard while
+		// also serving the manifest and icon requests; a single thread can make
+		// that transfer stall. A small pool keeps it snappy without hogging CPU.
+		app.threadPool = .init(numberOfThreads: 4)
 		
-		if getServerMethod() != 1 {
-			if let tls = try tls() {
-				app.http.server.configuration.tlsConfiguration = tls
-			}
+		// Only External (2) serves TLS (the backloop cert). Fully Local (0) and
+		// Semi Local (1) always serve plain HTTP: their manifests are fetched
+		// from palera.in over HTTPS, so the listener itself never needs TLS.
+		// Keeping the listener in sync with `usesTLS` is what makes the
+		// manifest scheme and the socket speak the same protocol.
+		if getServerMethod() == 2, let tls = try tls() {
+			app.http.server.configuration.tlsConfiguration = tls
 		}
 		
 		app.http.server.configuration.hostname = sni()
 		app.http.server.configuration.tcpNoDelay = true
+
+		// The listener binds every interface (0.0.0.0) for every server type.
+		// The URLs the manifest advertises are loopback-only (127.0.0.1), so
+		// only on-device connections should arrive — but binding 0.0.0.0 is
+		// required for installd to reach the listener on iOS: the
+		// proven-working Semi Local + “Only use localhost address” path binds
+		// 0.0.0.0, while binding exactly 127.0.0.1 produced the system's
+		// “cannot connect to 127.0.0.1” alert.
 		app.http.server.configuration.address = .hostname("0.0.0.0", port: port)
 		app.http.server.configuration.port = port
 		app.routes.defaultMaxBodySize = "128mb"
@@ -45,14 +59,34 @@ extension ServerInstaller {
 	// MARK: Files/IP
 	func sni() -> String {
 		let localhost = "127.0.0.1"
-		
-		if getServerMethod() == 1 {
+
+		switch getServerMethod() {
+		case 0:
+			// Fully Local serves the manifest and payload over loopback only.
+			// The listener is always plain HTTP on 127.0.0.1 and the /install
+			// page hands SpringBoard the palera.in HTTPS manifest (the payload
+			// still streams from this loopback listener) — the same flow as
+			// Semi Local with “Only use localhost address”, which installs
+			// cleanly on iOS 18.
+			return localhost
+		case 1:
 			return !self.getIPFix()
 				? (Self.getLocalAddress() ?? localhost)
 				: localhost
-		} else {
-			return readCommonName() ?? localhost
+		default:
+			return readConcreteCommonName() ?? localhost
 		}
+	}
+	
+	/// The stored common name is a wildcard (`*.backloop.dev`), which cannot
+	/// be used as a URL host. Rewrite it to a concrete subdomain that resolves
+	/// to loopback so the same wildcard certificate validates the connection.
+	func readConcreteCommonName() -> String? {
+		guard let name = readCommonName(), !name.isEmpty else { return nil }
+		if name.hasPrefix("*.") {
+			return "test." + name.dropFirst(2)
+		}
+		return name
 	}
 	
 	func tls() throws -> TLSConfiguration? {

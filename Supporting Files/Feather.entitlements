@@ -4,5 +4,27 @@
 <dict>
 	<key>get-task-allow</key>
 	<true/>
+	<!-- iOS 18 server-based install (Feather HOW_IT_WORKS.md): the local install
+	     server needs these so SpringBoard/installd can fetch the manifest and
+	     payload from the on-device listener. -->
+	<key>com.apple.developer.associated-domains</key>
+	<array>
+		<string>applinks:backloop.dev</string>
+	</array>
+	<key>com.apple.developer.networking.custom-protocol</key>
+	<array>
+		<dict>
+			<key>network-protocols</key>
+			<array>
+				<string>itms-services</string>
+			</array>
+		</dict>
+	</array>
+	<key>com.apple.developer.managed-associated-domains</key>
+	<array/>
+	<key>com.apple.developer.networking.networkextension</key>
+	<array>
+		<string>packet-tunnel-provider</string>
+	</array>
 </dict>
 </plist>

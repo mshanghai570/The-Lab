@@ -1,8 +1,8 @@
 //
 //  AppIconView.swift
-//  Feather
+//  The Lab
 //
-//  Created by samara on 19.06.2025.
+//  Created by Michael Shingara on 8/4/26.
 //
 
 import SwiftUI
@@ -26,7 +26,11 @@ extension AppIconView {
 	}
 	
 	static func altImage(_ name: String?) -> UIImage {
-		let path = Bundle.main.bundleURL.appendingPathComponent((name ?? "AppIcon60x60") + "@2x.png")
+		// Alternate icon PNGs land at the bundle root as <name>.png.
+		// The default row (key == nil) shows the primary icon, which the
+		// asset catalog compiles to AppIcon60x60@2x.png.
+		let fileName = name.map { "\($0).png" } ?? "AppIcon60x60@2x.png"
+		let path = Bundle.main.bundleURL.appendingPathComponent(fileName)
 		return UIImage(contentsOfFile: path.path) ?? UIImage()
 	}
 }
@@ -37,16 +41,12 @@ struct AppIconView: View {
 	
 	// dont translate
 	var sections: [String: [AltIcon]] = [
-		"Main": [
-			AltIcon(displayName: "Feather", author: "Samara", key: nil),
-			AltIcon(displayName: "Feather (macOS)", author: "Samara", key: "V2Mac"),
-			AltIcon(displayName: "Feather v1", author: "Samara", key: "V1"),
-			AltIcon(displayName: "Feather v1 (macOS)", author: "Samara", key: "V1Mac"),
-			AltIcon(displayName: "Feather v0", author: "Samara", key: "V0"),
-			AltIcon(displayName: "Feather Donor", author: "Samara", key: "Donor")
-		],
-		"Wingio": [
-			AltIcon(displayName: "Feather", author: "Wingio", key: "Wing"),
+		"The Lab": [
+			AltIcon(displayName: "Default", author: "The Lab", key: nil),
+			AltIcon(displayName: "thelabicon4", author: "The Lab", key: "thelabicon4"),
+			AltIcon(displayName: "IMG_2780", author: "The Lab", key: "IMG_2780"),
+			AltIcon(displayName: "IMG_2775", author: "The Lab", key: "IMG_2775"),
+			AltIcon(displayName: "1785716933087_0", author: "The Lab", key: "1785716933087_0")
 		]
 	]
 	

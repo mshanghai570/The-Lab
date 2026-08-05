@@ -352,10 +352,24 @@ int checkCert(
 		if (httpResponse.statusCode == 200 && data) {
 			// You can save `data` or parse the response
 			const void *respBytes = [data bytes];
-			OCSP_RESPONSE *resp;
-			d2i_OCSP_RESPONSE(&resp, (const unsigned char**)&respBytes, data.length);
+			OCSP_RESPONSE *resp = NULL;
+			if (d2i_OCSP_RESPONSE(&resp, (const unsigned char**)&respBytes, data.length) == NULL || resp == NULL) {
+				completionHandler(2, nil, @"Invalid OCSP response");
+				return;
+			}
 			OCSP_BASICRESP *basic = OCSP_response_get1_basic(resp);
+			if (basic == NULL) {
+				OCSP_RESPONSE_free(resp);
+				completionHandler(2, nil, @"Unable to parse OCSP response");
+				return;
+			}
 			ASN1_TIME *expirationDateAsn1 = X509_get_notAfter(cert);
+			if (expirationDateAsn1 == NULL || expirationDateAsn1->data == NULL) {
+				OCSP_BASICRESP_free(basic);
+				OCSP_RESPONSE_free(resp);
+				completionHandler(2, nil, @"Unable to read certificate expiration");
+				return;
+			}
 			NSString *fullDateString = [NSString stringWithFormat:@"20%s", expirationDateAsn1->data];
 			
 			NSDateFormatter *formatter = [[NSDateFormatter alloc] init];
